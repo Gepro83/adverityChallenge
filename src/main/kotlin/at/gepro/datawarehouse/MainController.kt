@@ -65,26 +65,33 @@ class MainController {
     @PostMapping(path= ["/totalClicks"])
     @ResponseBody
     fun totalClicks(
-            @RequestParam datasource: String,
+            @RequestParam(required = false) datasource: String?,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) from: LocalDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) to: LocalDate
-    ): Long {
-
-        return repository.totalClicksForDatasourceInDateRange(
-                datasource = datasource,
+    ): Long = datasource?.let {
+            repository.sumOfClicksByDatasourceInDateRange(
+                    datasource = it,
+                    from = from,
+                    to = to
+            )
+        } ?: repository.sumOfClicksInDateRange(
                 from = from,
                 to = to
         )
-    }
 
     @PostMapping(path= ["/clickThroughRate"])
     @ResponseBody
     fun clickThroughRate(
-            @RequestParam datasource: String,
-            @RequestParam campaign: String,
-    ): ClickThroughRate {
-        return ClickThroughRate.of(repository.findByDatasourceAndCampaign(datasource, campaign))
-    }
+            @RequestParam(required = false) datasource: String?,
+            @RequestParam(required = false) campaign: String?,
+    ): ClickThroughRate =
+            when {
+                datasource != null && campaign != null -> repository.findByDatasourceAndCampaign(datasource, campaign)
+                datasource != null && campaign == null -> repository.findByDatasource(datasource)
+                datasource == null && campaign != null -> repository.findByCampaign(campaign)
+                else -> repository.findAll().filterNotNull()
+            }.let { ClickThroughRate.of(it) }
+
 
     @PostMapping(path= ["/totalImpressions"])
     @ResponseBody

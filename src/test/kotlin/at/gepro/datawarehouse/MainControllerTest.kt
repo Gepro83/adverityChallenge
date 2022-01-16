@@ -1,5 +1,6 @@
 package at.gepro.datawarehouse
 
+import at.gepro.datawarehouse.business.ClickThroughRate
 import at.gepro.datawarehouse.jpa.DataPoint
 import at.gepro.datawarehouse.jpa.Repository
 import org.junit.jupiter.api.AfterEach
@@ -37,24 +38,31 @@ class MainControllerTest {
             ),
             DataPoint(
                     datasource = "google",
-                    campaign = "some campaing",
-                    day = LocalDate.of(2020, 10, 3),
+                    campaign = "some other google campaing",
+                    day = LocalDate.of(2020, 10, 2),
                     clicks = 1L,
                     impressions = 10L
             ),
             DataPoint(
                     datasource = "google",
-                    campaign = "some campaing",
+                    campaign = "some other google campaing",
                     day = LocalDate.of(2020, 10, 4),
                     clicks = 5L,
                     impressions = 10L
             ),
             DataPoint(
                     datasource = "twitter",
-                    campaign = "some campaing",
-                    day = LocalDate.of(2020, 10, 6),
+                    campaign = "multi source campaign",
+                    day = LocalDate.of(2020, 10, 2),
                     clicks = 12L,
-                    impressions = 10L
+                    impressions = 100L
+            ),
+            DataPoint(
+                    datasource = "facebook",
+                    campaign = "multi source campaign",
+                    day = LocalDate.of(2020, 10, 6),
+                    clicks = 1L,
+                    impressions = 100L
             ),
     )
 
@@ -101,6 +109,60 @@ class MainControllerTest {
                         from = LocalDate.of(2020, 10, 3),
                         to = LocalDate.of(2020, 10, 1)
                 )
+        )
+    }
+
+    @Test
+    fun `expect clicks over all datasources for null datasource`() {
+        assertEquals(
+                29L,
+                mainController.totalClicks(
+                        null,
+                        from = LocalDate.of(2020, 10, 1),
+                        to = LocalDate.of(2020, 10, 10)
+                )
+        )
+    }
+
+    @Test
+    fun `expect ctr of campaign and datasource when both parameters present`() {
+        assertEquals(
+                ClickThroughRate.of(testDataset.filter {
+                    it.campaign == "multi source campaign" && it.datasource == "twitter"
+                }),
+                mainController.clickThroughRate("twitter", "multi source campaign")
+        )
+    }
+
+    @Test
+    fun `expect ctr of whole dataset for clickThroughRate without parameters`() {
+        assertEquals(
+                ClickThroughRate.of(testDataset),
+                mainController.clickThroughRate(null, null)
+        )
+    }
+
+    @Test
+    fun `expect ctr of all campaigns in datasource when campaign null`() {
+        assertEquals(
+                ClickThroughRate.of(testDataset.filter { it.datasource == "google"} ),
+                mainController.clickThroughRate("google", null)
+        )
+    }
+
+    @Test
+    fun `expect ctr of all datasources for campaign when datasource null`() {
+        assertEquals(
+                ClickThroughRate.of(testDataset.filter { it.campaign == "multi source campaign"} ),
+                mainController.clickThroughRate(null, "multi source campaign")
+        )
+    }
+
+    @Test
+    fun `expect sum of impressions per day over datasources and campaigns`() {
+        assertEquals(
+                120L,
+                mainController.totalImpressions(LocalDate.of(2020, 10, 2))
         )
     }
 
