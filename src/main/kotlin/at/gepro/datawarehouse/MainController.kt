@@ -3,6 +3,7 @@ package at.gepro.datawarehouse
 import at.gepro.datawarehouse.business.ClickThroughRate
 import at.gepro.datawarehouse.jpa.DataPoint
 import at.gepro.datawarehouse.jpa.Repository
+import at.gepro.datawarehouse.util.CsvParser
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.format.annotation.DateTimeFormat
@@ -30,34 +31,13 @@ class MainController {
 
     @PostMapping("/")
     fun handleFileUpload(@RequestParam("file") file: MultipartFile, redirectAttributes: RedirectAttributes): String {
-        redirectAttributes.addFlashAttribute("message", "You successfully uploaded " + file.originalFilename + "!")
 
-        with(file.inputStream.bufferedReader()) {
-            val headerLine: String? = readLine()
-            if (headerLine  == "Datasource,Campaign,Daily,Clicks,Impressions") {
-                val entities = readLines().mapNotNull { line ->
-                    val split = line.split(',')
-                    if (split.size != 5)
-                        null
-                    else
-                        try {
-                            DataPoint(
-                                    datasource = split[0],
-                                    campaign = split[1],
-                                    day = LocalDate.parse(split[2], DateTimeFormatter.ofPattern("MM/dd/yy")),
-                                    clicks = split[3].toLong(),
-                                    impressions = split[4].toLong(),
-                            )
-                        } catch(e: Exception) {
-                            LOG.warn("could not deserialize $split", e)
-                            null
-                        }
-                }
+        if (repository.findAll().isEmpty()) {
+            repository.saveAll(CsvParser(file.inputStream))
+            redirectAttributes.addFlashAttribute("message", "You successfully uploaded " + file.originalFilename + "!")
+        } else
+            redirectAttributes.addFlashAttribute("message", "Data already loaded!")
 
-                repository.saveAll(entities)
-
-            }
-        }
 
         return "redirect:/"
     }

@@ -28,7 +28,7 @@ class ClickThroughRateTest {
     }
 
     @Test
-    fun `ctr of multiple datapoints is average ctr`() {
+    fun `ctr of multiple datapoints is sum of clicks divided by sum of impressions`() {
         val datapoints = listOf(
                 DataPoint(
                         datasource = "doesnt matter",
@@ -48,8 +48,8 @@ class ClickThroughRateTest {
                         datasource = "doesnt matter",
                         campaign = "doesnt matter",
                         day = LocalDate.now(),
-                        clicks = 0L,
-                        impressions = 100L
+                        clicks = 1L,
+                        impressions = 110L
                 ),
         )
 

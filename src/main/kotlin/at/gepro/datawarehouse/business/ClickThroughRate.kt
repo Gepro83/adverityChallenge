@@ -7,13 +7,16 @@ value class ClickThroughRate(val value: Float) {
 
     companion object {
         fun of(datapoints: List<DataPoint>): ClickThroughRate =
-                datapoints.map { calculateRate(it.clicks, it.impressions) }
-                        .average()
-                        .toFloat()
-                        .takeUnless { it.isNaN() }
-                        .let { ClickThroughRate(it ?: 0.0f) }
+                datapoints.map { it.clicks to it.impressions }
+                        .reduceOrNull { accumulator, element -> accumulator + element}
+                        ?.let { calculateRate(it.first, it.second) }
+                        ?: ClickThroughRate(0.0f)
 
+        private operator fun Pair<Long, Long>.plus(other: Pair<Long, Long>) =
+                first + other.first to second + other.second
 
-        private fun calculateRate(clicks: Long, impressions: Long): Float = clicks.toFloat() / impressions
+        private fun calculateRate(clicks: Long, impressions: Long) =
+                ClickThroughRate(clicks.toFloat() / impressions)
+
     }
 }
