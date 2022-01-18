@@ -1,7 +1,6 @@
 package at.gepro.datawarehouse
 
 import at.gepro.datawarehouse.business.ClickThroughRate
-import at.gepro.datawarehouse.jpa.DataPoint
 import at.gepro.datawarehouse.jpa.Repository
 import at.gepro.datawarehouse.util.CsvParser
 import org.slf4j.LoggerFactory
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 private val LOG = LoggerFactory.getLogger(MainController::class.java)
 
@@ -33,7 +31,7 @@ class MainController {
     fun handleFileUpload(@RequestParam("file") file: MultipartFile, redirectAttributes: RedirectAttributes): String {
 
         if (repository.findAll().isEmpty()) {
-            repository.saveAll(CsvParser(file.inputStream))
+            repository.saveAll(CsvParser.execute(file.inputStream))
             redirectAttributes.addFlashAttribute("message", "You successfully uploaded " + file.originalFilename + "!")
         }
 

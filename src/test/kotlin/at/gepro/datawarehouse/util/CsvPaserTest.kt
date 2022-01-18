@@ -11,7 +11,7 @@ class CsvPaserTest {
     fun `empty stream to empty list`() {
         assertEquals(
                 emptyList<DataPoint>(),
-                CsvParser("".byteInputStream())
+                CsvParser.execute("".byteInputStream())
         )
     }
 
@@ -40,7 +40,7 @@ class CsvPaserTest {
                                 impressions = 22
                         ),
                 ),
-                CsvParser(input.byteInputStream())
+                CsvParser.execute(input.byteInputStream())
         )
     }
 
@@ -61,7 +61,7 @@ class CsvPaserTest {
                                 impressions = 789
                         )
                 ),
-                CsvParser(input.byteInputStream())
+                CsvParser.execute(input.byteInputStream())
         )
     }
 
@@ -83,7 +83,7 @@ class CsvPaserTest {
                                 impressions = 789
                         )
                 ),
-                CsvParser(input.byteInputStream())
+                CsvParser.execute(input.byteInputStream())
         )
     }
 
@@ -105,7 +105,7 @@ class CsvPaserTest {
                                 impressions = 22
                         )
                 ),
-                CsvParser(input.byteInputStream())
+                CsvParser.execute(input.byteInputStream())
         )
     }
 
@@ -127,7 +127,7 @@ class CsvPaserTest {
                                 impressions = 22
                         )
                 ),
-                CsvParser(input.byteInputStream())
+                CsvParser.execute(input.byteInputStream())
         )
     }
 
@@ -141,7 +141,7 @@ class CsvPaserTest {
 
         assertEquals(
                 emptyList<DataPoint>(),
-                CsvParser(input.byteInputStream())
+                CsvParser.execute(input.byteInputStream())
         )
     }
 

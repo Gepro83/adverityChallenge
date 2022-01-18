@@ -12,7 +12,7 @@ object CsvParser {
     private val LOG = LoggerFactory.getLogger(CsvParser::class.java)
     private const val EXPECTED_HEADER = "Datasource,Campaign,Daily,Clicks,Impressions"
 
-    operator fun invoke(inputStream: InputStream): List<DataPoint> {
+    fun execute(inputStream: InputStream): List<DataPoint> {
         with(inputStream.bufferedReader()) {
             if (readLine() != EXPECTED_HEADER)
                 return emptyList()
