@@ -35,9 +35,7 @@ class MainController {
         if (repository.findAll().isEmpty()) {
             repository.saveAll(CsvParser(file.inputStream))
             redirectAttributes.addFlashAttribute("message", "You successfully uploaded " + file.originalFilename + "!")
-        } else
-            redirectAttributes.addFlashAttribute("message", "Data already loaded!")
-
+        }
 
         return "redirect:/"
     }
