@@ -38,7 +38,7 @@ class MainController {
         return "redirect:/"
     }
 
-    @PostMapping(path= ["/totalClicks"])
+    @GetMapping(path= ["/totalClicks"])
     @ResponseBody
     fun totalClicks(
             @RequestParam(required = false) datasource: String?,
@@ -55,7 +55,7 @@ class MainController {
                 to = to
         )
 
-    @PostMapping(path= ["/clickThroughRate"])
+    @GetMapping(path= ["/clickThroughRate"])
     @ResponseBody
     fun clickThroughRate(
             @RequestParam(required = false) datasource: String?,
@@ -69,7 +69,7 @@ class MainController {
             }.let { ClickThroughRate.of(it) }
 
 
-    @PostMapping(path= ["/totalImpressions"])
+    @GetMapping(path= ["/totalImpressions"])
     @ResponseBody
     fun totalImpressions(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: LocalDate): Long =
             repository.findByDay(date).sumOf { it.impressions }
